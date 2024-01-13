@@ -15,7 +15,7 @@
 					<img src="images/img-01.png" alt="IMG">
 				</div>
 
-				<form class="login100-form validate-form" action="Controlleur.jsp" method="post">
+				<form class="login100-form validate-form" action="Controlleur" method="post">
 					<span class="login100-form-title">
 						Member Login
 					</span>
