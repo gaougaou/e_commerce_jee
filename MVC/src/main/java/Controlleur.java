@@ -42,7 +42,7 @@ public class Controlleur extends HttpServlet {
             ST.setString(2, request.getParameter("password"));
             ResultSet RS = ST.executeQuery();
             if (RS.next()) {
-                response.sendRedirect("Acceuil.jsp");
+                response.sendRedirect("Commande.jsp");
             } else {
                 response.sendRedirect("index.jsp");
             }
