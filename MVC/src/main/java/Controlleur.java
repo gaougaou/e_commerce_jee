@@ -36,7 +36,7 @@ public class Controlleur extends HttpServlet {
 
         try {
             Connection con = DriverManager.getConnection(DBURL, un, ps);
-            String req = "SELECT * FROM clients WHERE email=? AND password=?";
+            String req = "SELECT * FROM fournisseur WHERE email=? AND password=?";
             PreparedStatement ST = con.prepareStatement(req);
             ST.setString(1, request.getParameter("email"));
             ST.setString(2, request.getParameter("password"));

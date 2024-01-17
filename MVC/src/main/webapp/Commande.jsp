@@ -1,16 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@ page import="java.util.List" %>
 <%@ page import="java.sql.*"%>
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="ISO-8859-1">
     <title>E-Commerce Cart</title>
     <style>
-        /* Styles are unchanged for brevity */
-            <style>
-        body {
+        <!-- Your existing styles -->
+       body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
@@ -80,7 +77,11 @@
         .finish-btn-container {
             margin-top: 20px;
         }
-    </style>
+
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center; /* Center the content within the container */
+        }
     </style>
 </head>
 <body>
@@ -89,6 +90,16 @@
         <div class="message">
             <p>Voici vos produits </p>
         </div>
+
+        <!-- Search bar -->
+        <div class="search-container">
+            <form action="" method="get">
+                <label for="productName">Recherche par nom:</label>
+                <input type="text" id="productName" name="productName">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </form>
+        </div>
+
         <table class="table table-light">
             <thead>
                 <tr>
@@ -100,45 +111,62 @@
                 </tr>
             </thead>
             <tbody>
-            <% 
-                String url = "jdbc:mysql://localhost:3306/e-commerce";
-                String user = "root";
-                String pwd = "";
-                int number = 0;
-                try {
-                    Connection con = DriverManager.getConnection(url, user, pwd);
-                    PreparedStatement pst = con.prepareStatement("SELECT * FROM produits");
-                    ResultSet rs = pst.executeQuery();
-                    while (rs.next()) {
-            %>
-                        <tr>
-                            <td><%= rs.getString(2) %></td>
-                            <td><%= rs.getString(3) %></td>
-                            <td><%= rs.getString(4) %></td>
-                            <td><a href="DeleteProductServlet?id=<%= rs.getString(1) %>" class="btn">Supprimer</a></td>
+                <%
+                    String productName = request.getParameter("productName");
 
-                            <td><a href="ModifierProduit.jsp?id=<%= rs.getString(1) %>" class="btn">Modifier</a></td> <!-- Added Modifier button -->
-                        </tr>
-            <%
+                    String url = "jdbc:mysql://localhost:3306/e-commerce";
+                    String user = "root";
+                    String pwd = "";
+                    int number = 0;
+                    try {
+                        Connection con = DriverManager.getConnection(url, user, pwd);
+
+                        // Construct the SQL query
+                        String query = "SELECT * FROM produits";
+                        
+                        // If there is a search parameter, modify the query
+                        if (productName != null && !productName.isEmpty()) {
+                            query += " WHERE nom LIKE ?";
+                        }
+
+                        PreparedStatement pst = con.prepareStatement(query);
+
+                        // Set the search parameter if it exists
+                        if (productName != null && !productName.isEmpty()) {
+                            pst.setString(1, "%" + productName + "%");
+                        }
+
+                        ResultSet rs = pst.executeQuery();
+                        while (rs.next()) {
+                %>
+                            <tr>
+                                <td><%= rs.getString(2) %></td>
+                                <td><%= rs.getString(3) %></td>
+                                <td><%= rs.getString(4) %></td>
+                                <td><a href="DeleteProductServlet?id=<%= rs.getString(1) %>" class="btn">Supprimer</a></td>
+
+                                <td><a href="ModifierProduit.jsp?id=<%= rs.getString(1) %>" class="btn">Modifier</a></td> <!-- Added Modifier button -->
+                            </tr>
+                <%
+                        }
+                        // Correction de la requête SQL
+                        pst = con.prepareStatement("SELECT COUNT(*) FROM produits");
+                        rs = pst.executeQuery();
+                        rs.next();
+                        number = rs.getInt(1);
+                        rs.close();
+                        pst.close();
+                        con.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
-                    // Correction de la requête SQL
-                    pst = con.prepareStatement("SELECT COUNT(*) FROM produits");
-                    rs = pst.executeQuery();
-                    rs.next();
-                    number = rs.getInt(1);
-                    rs.close();
-                    pst.close();
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            %>  
+                %>  
                 
             </tbody>
         </table>
     </div>
     <div class="finish-btn-container center-container">
-        <a href="AjouterProduit.jsp" class="btn btn-primary">Ajouter un produit</a> <!-- Replaced "Finir la commande" with "Ajouter un produit" -->
+        <a href="AjouterProduit.jsp" class="btn btn-primary">Ajouter un produit</a>
     </div>
 
 </body>
